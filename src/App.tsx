@@ -6,56 +6,81 @@ const Wrapper = styled(motion.div)`
   height: 100vh;
   width: 100vw;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
+  button {
+    margin-top: 20px;
+  }
 `;
 
 const Box = styled(motion.div)`
-  width: 300px;
+  width: 200px;
   height: 200px;
   background-color: white;
   border-radius: 40px;
   position: absolute;
-  top: 160px;
+  top: 150px;
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.06);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 28px;
 `;
 
 const boxVariants = {
-  start: {
-    opacity: 0,
-    scale: 0,
+  entry: (back: boolean) => {
+    return {
+      x: back ? -500 : 500,
+      opacity: 0,
+      scale: 0,
+    };
   },
-  visible: {
+  center: {
+    x: 0,
     opacity: 1,
     scale: 1,
-    rotateZ: 360,
+    transition: {
+      duration: 0.5,
+    },
   },
-  leaving: {
-    opacity: 0,
-    scale: 0,
-    y: 20,
+  exit: (back: boolean) => {
+    return {
+      x: back ? 500 : -500,
+      opacity: 0,
+      scale: 0,
+    };
   },
 };
 
 function App() {
-  const [showing, setShowing] = useState(false);
-  const toggleShowing = () => {
-    setShowing((prev) => !prev);
+  const [visible, setVisible] = useState(1);
+  const nextPlease = () => {
+    setBack(false);
+    setVisible((prev) => (prev === 10 ? 10 : prev + 1));
   };
+  const prevPlease = () => {
+    setBack(true);
+    setVisible((prev) => (prev === 1 ? 1 : prev - 1));
+  };
+
+  const [back, setBack] = useState(false);
   return (
     <Wrapper>
-      <button onClick={toggleShowing}>Click</button>
-      <AnimatePresence>
-        {showing ? (
-          <Box
-            variants={boxVariants}
-            initial="start"
-            animate="visible"
-            exit="leaving"
-          />
-        ) : null}
+      <AnimatePresence custom={back}>
+        <Box
+          custom={back}
+          variants={boxVariants}
+          initial="entry"
+          animate="center"
+          exit="exit"
+          key={visible}
+        >
+          {visible}
+        </Box>
       </AnimatePresence>
+      <button onClick={nextPlease}>next</button>
+      <button onClick={prevPlease}>Prev</button>
     </Wrapper>
   );
 }
